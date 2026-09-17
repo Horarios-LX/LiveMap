@@ -78,9 +78,10 @@ async function acquireWakeLock() {
     if (document.visibilityState !== "visible")
         return;
 
-    if (!("wakeLock" in navigator))
+    if (!("wakeLock" in navigator)) {
         alert("wake lock not in navigator")
         return;
+    }
 
     try {
         wakeLock = await navigator.wakeLock.request("screen");
