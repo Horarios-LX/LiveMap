@@ -1,0 +1,96 @@
+:root {
+    --color-background: #181b20;
+    --color-foreground: #282e39;
+    --color-accent: #f7c625;
+}
+
+body, html {
+    background-color: var(--color-background);
+    margin: 0px;
+    font-family: Ubuntu, "Segoe UI", Verdana, sans-serif;
+}
+
+#loginDiv {
+    background-color: var(--color-foreground);
+    position: absolute;
+    min-width: 100vw;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 0.75rem;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    color: white;
+}
+
+#loginDiv p {
+    margin: 0 0 0.5rem;
+    font-size: 6rem;
+    font-weight: bold;
+}
+
+#loginDiv label {
+    font-size: 4rem;
+}
+
+#loginDiv input,
+#loginDiv button {
+    width: min(100%, 30rem);
+    box-sizing: border-box;
+
+    padding: 0.75rem 1rem;
+    font-size: 4rem;
+}
+
+#loginDiv button {
+    width: min(100%, 20rem);
+    background-color: var(--color-accent);
+    color: white;
+    font-weight: bold;
+    margin-top: 2rem;
+    border-style: none;
+    padding: 1rem;
+    border-radius: 2rem;
+}
+
+#loginDiv button:disabled {
+    background-color: #555;
+    color: #aaa;
+}
+
+#loginDiv button {
+    cursor: pointer;
+}
+
+#status {
+    color: #cccccc;
+    font-size: 2rem !important;
+    line-height: 2rem;
+    height: 2rem;
+}
+
+span.line {
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+    font-family: Inter, Ubuntu;
+    min-width: 4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2rem;
+    padding: .5rem;
+    border-radius: 2rem;
+}
+
+span.line.long {
+    background-color: #c61d23 !important;
+}
+
+span.line.short {
+    background-color: #3d85c6 !important;
+}
