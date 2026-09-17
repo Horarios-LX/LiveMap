@@ -1,3 +1,4 @@
+let loginDiv = document.getElementById('loginDiv')
 let loginButton = document.getElementById('loginBtn');
 let vehicleIdInput = document.getElementById('vehicleId');
 let vehicleIdStatus = document.getElementById('status')
@@ -17,7 +18,10 @@ function startWebSocket() {
 
     webSocket.addEventListener("open", () => {
         console.log("CONNECTED");
-    
+        if(window.selectedVehicle) {
+            webSocket.send(JSON.stringify({ type: 'vehicleFocus', value: window.selectedVehicle}))
+            loginDiv.style.display = "none";
+        }
     });
 
     webSocket.addEventListener("message", (event) => {
@@ -26,7 +30,6 @@ function startWebSocket() {
         switch(data.type) {
             case "vehicleValidation":
                 let vehicle = data.value;
-                console.log(vehicle)
                 if(!vehicle && vehicleIdInput.value.trim() !== '') {
                     vehicleIdStatus.innerHTML = "Veículo não encontrado"
                     loginButton.disabled = true;
@@ -41,6 +44,12 @@ function startWebSocket() {
                         vehicleIdStatus.innerHTML = 'A circular na <span class="line long">' + (vehicle.line_id) + '</span>.'
                     } else vehicleIdStatus.innerHTML = 'Circulou na <span class="line long">' + (vehicle.line_id) + '</span> há ' + formatTimeSeconds(timeDif) + '.'
                 }
+                break;
+            case "vehicleUpdate":
+                moveMapToLatLon(data.value)
+                break;
+            case "vehicleNeighbours":
+                updateOtherCars(data.value)
         }
         // A circular na <span class="line long">1622</span>.
     });
@@ -59,6 +68,12 @@ vehicleIdInput.addEventListener('input', function() {
 
     webSocket.send(JSON.stringify({ type: 'vehicleIdInput', value: vehicleIdInput.value }));
 })
+
+loginButton.onclick = () => {
+    window.selectedVehicle = vehicleIdInput.value;
+    webSocket.send(JSON.stringify({ type: 'vehicleFocus', value: vehicleIdInput.value}))
+    loginDiv.style.display = "none";
+}
 
 function formatTimeSeconds(secs) {
     const minutes = Math.floor(secs / 60);
@@ -79,7 +94,6 @@ async function acquireWakeLock() {
         return;
 
     if (!("wakeLock" in navigator)) {
-        alert("wake lock not in navigator")
         return;
     }
 
@@ -87,13 +101,8 @@ async function acquireWakeLock() {
         wakeLock = await navigator.wakeLock.request("screen");
 
         wakeLock.addEventListener("release", () => {
-            console.log("Wake lock released");
             wakeLock = null;
-            alert("wake lock released")
         });
-
-        console.log("Wake lock acquired");
-        alert("wake lock acquired")
     } catch (err) {
         console.error("Failed to acquire wake lock:", err);
     }
@@ -102,7 +111,6 @@ async function acquireWakeLock() {
 async function releaseWakeLock() {
     if (wakeLock) {
         await wakeLock.release();
-        alert("wake lock released")
         wakeLock = null;
     }
 }
@@ -113,12 +121,12 @@ document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible") {
         // App came back into focus
         await acquireWakeLock();
-        startWebSocket()
+        //startWebSocket()
     } else {
         // App went into the background
         await releaseWakeLock();
-        paused = true;
+        /*paused = true;
         webSocket.onclose = function () {}; // disable onclose handler first
-        webSocket.close();
+        webSocket.close();*/
     }
 });

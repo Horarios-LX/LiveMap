@@ -1,0 +1,8 @@
+{
+  "name": "CMet - Live Map",
+  "short_name": "Live Map",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}
