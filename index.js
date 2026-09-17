@@ -6,7 +6,7 @@ let vehicleIdStatus = document.getElementById('status')
 let wakeLock = null;
 let keepScreenAwake = true;
 
-const wsUri = "ws://192.168.1.132:3001";
+const wsUri = "ws://mvs22.vm.blahajcloud.net:3001";
 let webSocket = null;
 
 startWebSocket()
