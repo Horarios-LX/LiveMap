@@ -180,6 +180,7 @@ map.on('style.load', async () => {
 });
 
 window.updateOtherCars = (vehicles) => {
+    vehicles = vehicles.filter(z => (Date.now() - z.timestamp) < 15*60*1000)
     otherBusFeatures = vehicles.map(v => ({
                 type: "Feature",
 
