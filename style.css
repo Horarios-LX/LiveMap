@@ -137,15 +137,12 @@ span.line.short {
 
 #logout {
     z-index: 999;
-    position: absolute;
-    left: 1rem;
-    bottom: 1rem;
-    min-width: 10rem;
+    min-width: 4rem;
     min-height: 2rem;
     line-height: 2rem;
     font-size: 2rem;
     font-weight: bold;
-    background-color: #741215;
+    background-color: #a90c11;
     padding: .5rem;
     border-radius: .5rem;
     color: white;
@@ -154,25 +151,70 @@ span.line.short {
 
 #themeToggle {
     z-index: 999;
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-    min-width: 10rem;
-    min-height: 2rem;
-    line-height: 2rem;
-    font-size: 2rem;
-    font-weight: bold;
+    height: 3rem;
+    width: 3rem;
     padding: .5rem;
     border-radius: .5rem;
     border-style: none;
 }
 
+#recenter {
+    z-index: 999;
+    min-width: 2rem;
+    height: 3rem;
+    padding: .5rem;
+    border-radius: .5rem;
+    background-color: white;
+    color:#3d85c6;
+    border-style: none;
+}
+
+#recenter svg {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    width: auto;
+    object-fit: contain;
+}
+
 #themeToggle.dark {
     background-color: white;
     color: var(--color-background);
+    background-image: url("/sun.svg");
 }
 
 #themeToggle.light {
-    background-color: black;
-    color: #cfcfcf;
+    background-color: white;
+    color: var(--color-background);
+    background-image: url("/moon.svg");
+    filter: invert();
+}
+
+.buttonRow {
+    display: flex;
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    gap: 1rem;
+}
+
+#serviceInfo {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    gap: .25rem;
+    z-index: 999;
+    margin: 0;
+    font-size: 2em;
+    transform: scale(0.75);
+    transform-origin: right bottom;
+    line-height: 2rem;
+    font-weight: bold;
+}
+
+#serviceInfo > span:not(.line) {
+    display: flex;
+    padding: .5rem;
+    align-items: center;
 }

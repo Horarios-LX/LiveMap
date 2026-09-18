@@ -2,6 +2,13 @@ let loginDiv = document.getElementById('loginDiv')
 let loginButton = document.getElementById('loginBtn');
 let vehicleIdInput = document.getElementById('vehicleId');
 let vehicleIdStatus = document.getElementById('status')
+let recenterBtn = document.getElementById('recenter')
+
+let serviceInfo = document.getElementById('serviceInfo')
+
+serviceInfo.innerHTML = ""
+
+recenterBtn.style.display = "none";
 
 let wakeLock = null;
 let keepScreenAwake = true;
@@ -10,17 +17,19 @@ let currentLine = null;
 
 let patternCache = {}
 
-const wsUri = "wss://ws.doesmtr.eu/";
+const wsUri = "ws://127.0.0.1:3001/";
 let webSocket = null;
 
 startWebSocket()
 
 let paused = false;
 
+let lastKnownVehicleInfo = null;
+
 let darkMode = false;
 document.getElementById("themeToggle").onclick = () => {
     darkMode = !darkMode;
-    document.getElementById("themeToggle").innerHTML = darkMode ? "DIA" : "NOITE"
+    //document.getElementById("themeToggle").innerHTML = darkMode ? "DIA" : "NOITE"
     document.getElementById("themeToggle").className = darkMode ? "dark" : "light"
 
     setTheme(darkMode)
@@ -29,22 +38,30 @@ document.getElementById("themeToggle").onclick = () => {
 document.getElementById("logout").onclick = () => {
     webSocket.send(JSON.stringify({ type: 'vehicleUnfocus', value: window.selectedVehicle}))
     window.selectedVehicle = null;
-            loginDiv.style.display = "flex";
+    loginDiv.style.display = "flex";
 }
+
+recenterBtn.onclick = () => {
+    if(lastKnownVehicleInfo) snapToVehicle(lastKnownVehicleInfo)
+}
+
+let patternIdDestCache = {}
 
 function startWebSocket() {
     webSocket = new WebSocket(wsUri);
 
     webSocket.addEventListener("open", () => {
         console.log("CONNECTED");
-        if(window.selectedVehicle) {
-            webSocket.send(JSON.stringify({ type: 'vehicleFocus', value: window.selectedVehicle}))
-            loginDiv.style.display = "none";
-        }
     });
 
     webSocket.addEventListener("message", (event) => {
-        if(event.data === "ping") return;
+        if(event.data === "ping") {
+            if(window.selectedVehicle) {
+                webSocket.send(JSON.stringify({ type: 'vehicleFocus', value: window.selectedVehicle}))
+                loginDiv.style.display = "none";
+            }
+            return;
+        };
         let data = JSON.parse(event.data)
         switch(data.type) {
             case "vehicleValidation":
@@ -65,15 +82,21 @@ function startWebSocket() {
                 }
                 break;
             case "vehicleUpdate":
+                if(!lastKnownVehicleInfo || lastKnownVehicleInfo.id !== data.value.id) serviceInfo.innerHTML = `A carregar...`
+                lastKnownVehicleInfo = data.value;
                 moveMapToLatLon(data.value)
                 if(currentLine !== data.value.line_id) {
                     currentLine = data.value.line_id
                     if(!patternCache[data.value.pattern_id]) {
                         fetch("https://go.tmlmobilidade.pt/hub/api/v1/network/patterns/%5BLA77N%5D" + data.value.pattern_id.split("]")[2]).then(p => p.json()).then(p => {
+                            patternIdDestCache[data.value.pattern_id] = p.data[0].headsign;
+                            serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)} | ${(Date.now() - data.value.timestamp) < 120*1000 ? "A circular" : "Circulou há " + formatTimeSeconds((Date.now() - data.value.timestamp) / 1000) }</span>`
+                            
                             patternCache[data.value.pattern_id] = decodeShape(p.data[0].shape_polyline);
                             drawMainRoute(decodeShape(p.data[0].shape_polyline));
                         })
                     } else {
+                        serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)} | ${(Date.now() - data.value.timestamp) < 120*1000 ? "A circular" : "Circulou há " + formatTimeSeconds((Date.now() - data.value.timestamp) / 1000) }</span>`
                         drawMainRoute(patternCache[data.value.pattern_id])
                     }
                     
@@ -89,6 +112,10 @@ function startWebSocket() {
         console.log("DISCONNECTED");
         if(!paused) setTimeout(startWebSocket, 1000);
     });
+}
+
+function getDest(p) {
+    return patternIdDestCache[p] || "[ERRO]"
 }
 
 loginButton.disabled = true;

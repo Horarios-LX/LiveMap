@@ -18,8 +18,18 @@
         <div id="main">
             <div id="map"></div>
         </div>
-        <button id="logout">Terminar serviço</button>
-        <button id="themeToggle" class="light">NOITE</button>
+        <div class="buttonRow">
+            <button id="logout">Sair</button>
+            <button id="themeToggle" class="light"></button>
+            <button id="recenter"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 4H5a1 1 0 0 0-1 1v4"/>
+                <path d="M15 4h4a1 1 0 0 1 1 1v4"/>
+                <path d="M9 20H5a1 1 0 0 1-1-1v-4"/>
+                <path d="M15 20h4a1 1 0 0 0 1-1v-4"/>
+                <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/>
+            </svg></button>
+        </div>
+        <p id="serviceInfo"><span class="line long">1613</span><span>Abóboda | A circular</span></p>
         <script src="https://unpkg.com/@googlemaps/polyline-codec/dist/index.umd.js"></script>
         <script type="module" src="./map.js"></script>
         <script src="./index.js"></script>
