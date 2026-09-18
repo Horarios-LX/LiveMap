@@ -27,7 +27,7 @@ let snapped = true;
 
 window.snapToVehicle = (v) => {
     snapped = true;
-    moveMapToLatLon(v)
+    if(v) moveMapToLatLon(v)
 }
 
 window.setTheme = (isDarkMode) => {

@@ -82,7 +82,10 @@ function startWebSocket() {
                 }
                 break;
             case "vehicleUpdate":
-                if(!lastKnownVehicleInfo || lastKnownVehicleInfo.id !== data.value.id) serviceInfo.innerHTML = `A carregar...`
+                if(!lastKnownVehicleInfo || lastKnownVehicleInfo.id !== data.value.id) {
+                    snapToVehicle(lastKnownVehicleInfo)
+                    serviceInfo.innerHTML = `A carregar...`
+                }
                 lastKnownVehicleInfo = data.value;
                 moveMapToLatLon(data.value)
                 if(currentLine !== data.value.line_id) {
