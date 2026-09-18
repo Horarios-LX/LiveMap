@@ -210,6 +210,7 @@ window.updateOtherCars = (vehicles) => {
 }
 
 window.moveMapToLatLon = (vehicle) => {
+    if(!vehicle.lon || !vehicle.lat) return;
     map.easeTo({
         center: [vehicle.lon, vehicle.lat],
         bearing: vehicle.bearing,
