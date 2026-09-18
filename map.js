@@ -5,7 +5,7 @@ const map = new maplibregl.Map({
     container: 'map',
 
     // OpenFreeMap
-    style: 'https://tiles.openfreemap.org/styles/dark',
+    style: 'https://tiles.openfreemap.org/styles/bright',
 
     center: [-9.312, 38.697],
     zoom: 15,
@@ -18,6 +18,14 @@ const map = new maplibregl.Map({
         return;
     }
 });
+
+let otherBusFeatures;
+let thisBusFeatures;
+let thisRouteFeatures;
+
+window.setTheme = (isDarkMode) => {
+    map.setStyle(isDarkMode ? 'https://tiles.openfreemap.org/styles/dark' : 'https://tiles.openfreemap.org/styles/bright');
+}
 
 async function loadImgs() {
     const icons = [
@@ -35,7 +43,9 @@ async function loadImgs() {
     }
 }
 
-map.on('load', async () => {
+
+
+map.on('style.load', async () => {
     console.log('Map loaded!');
     await loadImgs();
     map.addSource("main-bus", {
@@ -52,6 +62,14 @@ map.on('load', async () => {
         data: {
             type: "FeatureCollection",
             features: []
+        }
+    });
+
+    map.addSource("main-route", {
+        type: "geojson",
+
+        data: {
+            type: "line"
         }
     });
     map.addLayer({
@@ -118,16 +136,51 @@ map.on('load', async () => {
 
             "icon-allow-overlap": true
         }
+    }, 'main-bus');
+
+    map.addLayer({
+        id: "main-route",
+        type: "line",
+        source: "main-route",
+        paint: {
+            'line-color': '#C61D23',
+            'line-width': 5
+        }
+    }, 'other-bus');
+
+    if(otherBusFeatures) {
+        map.getSource("other-bus").setData({
+        type: "FeatureCollection",
+
+        features: 
+            otherBusFeatures
+        
     });
+    }
+
+    if(thisBusFeatures) {
+        map.getSource("main-bus").setData({
+        type: "FeatureCollection",
+
+        features: 
+            thisBusFeatures
+        
+    });
+    }
+
+    console.log(thisRouteFeatures)
+
+    if(thisRouteFeatures) {
+        map.getSource("main-route").setData({
+            type: 'FeatureCollection',
+            features: [thisRouteFeatures]
+        })
+    }
 
 });
 
 window.updateOtherCars = (vehicles) => {
-    map.getSource("other-bus").setData({
-        type: "FeatureCollection",
-
-        features: 
-            vehicles.map(v => ({
+    otherBusFeatures = vehicles.map(v => ({
                 type: "Feature",
 
                 properties: {
@@ -145,7 +198,12 @@ window.updateOtherCars = (vehicles) => {
                     ]
                 }
             })
-            )
+            );
+    map.getSource("other-bus").setData({
+        type: "FeatureCollection",
+
+        features: 
+            otherBusFeatures
         
     });
 }
@@ -168,10 +226,7 @@ window.moveMapToLatLon = (vehicle) => {
         duration: 500
     });
 
-    map.getSource("main-bus").setData({
-        type: "FeatureCollection",
-
-        features: [
+    thisBusFeatures = [
             {
                 type: "Feature",
 
@@ -191,6 +246,33 @@ window.moveMapToLatLon = (vehicle) => {
                 }
             }
         ]
+    map.getSource("main-bus").setData({
+        type: "FeatureCollection",
+
+        features: thisBusFeatures
     });
 
+}
+
+window.drawMainRoute = (route) => {
+    console.log(route)
+    thisRouteFeatures = route;
+    map.getSource("main-route").setData({
+            type: 'FeatureCollection',
+            features: [thisRouteFeatures]
+    })
+}
+
+
+window.decodeShape = (shape) => {
+    const points = polyline.decode(shape, 6);
+const coordinates = points.map(([lat, lon]) => [lon, lat]);
+return {
+    type: 'Feature',
+    geometry: {
+        type: 'LineString',
+        coordinates: coordinates
+    },
+    properties: {}
+};
 }

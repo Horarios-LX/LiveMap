@@ -134,3 +134,45 @@ span.line.short {
     pointer-events: none;
     border-radius: 0% !important;
 }
+
+#logout {
+    z-index: 999;
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    min-width: 10rem;
+    min-height: 2rem;
+    line-height: 2rem;
+    font-size: 2rem;
+    font-weight: bold;
+    background-color: #741215;
+    padding: .5rem;
+    border-radius: .5rem;
+    color: white;
+    border-style: none;
+}
+
+#themeToggle {
+    z-index: 999;
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    min-width: 10rem;
+    min-height: 2rem;
+    line-height: 2rem;
+    font-size: 2rem;
+    font-weight: bold;
+    padding: .5rem;
+    border-radius: .5rem;
+    border-style: none;
+}
+
+#themeToggle.dark {
+    background-color: white;
+    color: var(--color-background);
+}
+
+#themeToggle.light {
+    background-color: black;
+    color: #cfcfcf;
+}

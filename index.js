@@ -6,12 +6,31 @@ let vehicleIdStatus = document.getElementById('status')
 let wakeLock = null;
 let keepScreenAwake = true;
 
+let currentLine = null;
+
+let patternCache = {}
+
 const wsUri = "wss://ws.doesmtr.eu/";
 let webSocket = null;
 
 startWebSocket()
 
 let paused = false;
+
+let darkMode = false;
+document.getElementById("themeToggle").onclick = () => {
+    darkMode = !darkMode;
+    document.getElementById("themeToggle").innerHTML = darkMode ? "DIA" : "NOITE"
+    document.getElementById("themeToggle").className = darkMode ? "dark" : "light"
+
+    setTheme(darkMode)
+}
+
+document.getElementById("logout").onclick = () => {
+    webSocket.send(JSON.stringify({ type: 'vehicleUnfocus', value: window.selectedVehicle}))
+    window.selectedVehicle = null;
+            loginDiv.style.display = "flex";
+}
 
 function startWebSocket() {
     webSocket = new WebSocket(wsUri);
@@ -47,6 +66,18 @@ function startWebSocket() {
                 break;
             case "vehicleUpdate":
                 moveMapToLatLon(data.value)
+                if(currentLine !== data.value.line_id) {
+                    currentLine = data.value.line_id
+                    if(!patternCache[data.value.pattern_id]) {
+                        fetch("https://go.tmlmobilidade.pt/hub/api/v1/network/patterns/%5BLA77N%5D" + data.value.pattern_id.split("]")[2]).then(p => p.json()).then(p => {
+                            patternCache[data.value.pattern_id] = decodeShape(p.data[0].shape_polyline);
+                            drawMainRoute(decodeShape(p.data[0].shape_polyline));
+                        })
+                    } else {
+                        drawMainRoute(patternCache[data.value.pattern_id])
+                    }
+                    
+                }
                 break;
             case "vehicleNeighbours":
                 updateOtherCars(data.value)
