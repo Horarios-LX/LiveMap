@@ -17,7 +17,7 @@ let currentLine = null;
 
 let patternCache = {}
 
-const wsUri = "ws://127.0.0.1:3001/";
+const wsUri = "wss://ws.doesmtr.eu/";
 let webSocket = null;
 
 startWebSocket()
