@@ -180,8 +180,6 @@ map.on('style.load', async () => {
         });
     }
 
-    console.log(thisRouteFeatures)
-
     if (thisRouteFeatures) {
         map.getSource("main-route").setData({
             type: 'FeatureCollection',
