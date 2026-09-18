@@ -89,7 +89,7 @@ map.on('style.load', async () => {
                 "bus"
             ],
 
-            "icon-size": 0.15,
+            "icon-size": 0.25,
 
             "icon-anchor": "center",
 
@@ -122,7 +122,7 @@ map.on('style.load', async () => {
                 "bus"
             ],
 
-            "icon-size": 0.075,
+            "icon-size": 0.15,
 
             "icon-anchor": "center",
 
@@ -187,7 +187,7 @@ window.updateOtherCars = (vehicles) => {
                 properties: {
                     id: v.id,
                     heading: v.bearing,
-                    status: "delay"
+                    status: "regular"
                 },
 
                 geometry: {
