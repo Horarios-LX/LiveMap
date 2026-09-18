@@ -97,13 +97,13 @@ function startWebSocket() {
                     if(!patternCache[data.value.pattern_id]) {
                         fetch("https://go.tmlmobilidade.pt/hub/api/v1/network/patterns/%5BLA77N%5D" + data.value.pattern_id.split("]")[2]).then(p => p.json()).then(p => {
                             patternIdDestCache[data.value.pattern_id] = p.data[0].headsign;
-                            serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)} | ${(Date.now() - data.value.timestamp) < 120*1000 ? "A circular" : "Circulou há " + formatTimeSeconds((Date.now() - data.value.timestamp) / 1000) }</span>`
+                            serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)}`
                             
                             patternCache[data.value.pattern_id] = decodeShape(p.data[0].shape_polyline);
                             drawMainRoute(decodeShape(p.data[0].shape_polyline));
                         })
                     } else {
-                        serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)} | ${(Date.now() - data.value.timestamp) < 120*1000 ? "A circular" : "Circulou há " + formatTimeSeconds((Date.now() - data.value.timestamp) / 1000) }</span>`
+                        serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)}`
                         drawMainRoute(patternCache[data.value.pattern_id])
                     }
                     
