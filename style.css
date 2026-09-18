@@ -179,13 +179,13 @@ span.line.short {
 #themeToggle.dark {
     background-color: white;
     color: var(--color-background);
-    background-image: url("/sun.svg");
+    background-image: url("./sun.svg");
 }
 
 #themeToggle.light {
     background-color: white;
     color: var(--color-background);
-    background-image: url("/moon.svg");
+    background-image: url("./moon.svg");
     filter: invert();
 }
 
