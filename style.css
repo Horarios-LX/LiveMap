@@ -207,7 +207,7 @@ span.line.short {
     z-index: 999;
     margin: 0;
     font-size: 2em;
-    transform: scale(0.75);
+    transform: scale(0.66);
     transform-origin: right bottom;
     line-height: 2rem;
     font-weight: bold;
@@ -217,4 +217,8 @@ span.line.short {
     display: flex;
     padding: .5rem;
     align-items: center;
+}
+
+#serviceInfo.dark {
+    color: white !important;
 }

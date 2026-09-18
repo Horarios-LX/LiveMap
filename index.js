@@ -31,7 +31,7 @@ document.getElementById("themeToggle").onclick = () => {
     darkMode = !darkMode;
     //document.getElementById("themeToggle").innerHTML = darkMode ? "DIA" : "NOITE"
     document.getElementById("themeToggle").className = darkMode ? "dark" : "light"
-
+    serviceInfo.className = darkMode ? "dark" : ""
     setTheme(darkMode)
 }
 
