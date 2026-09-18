@@ -282,7 +282,6 @@ window.drawMainRoute = (route) => {
 
 function isSimilarLine(v) {
     let vLine = v.line_id;
-    console.log(vLine)
     switch (currentLine) {
         case "1614":
             return vLine === "1618" || vLine === "1614";

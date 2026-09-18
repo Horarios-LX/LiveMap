@@ -14,6 +14,7 @@ let wakeLock = null;
 let keepScreenAwake = true;
 
 let currentLine = null;
+let currentPattern = null;
 
 let patternCache = {}
 
@@ -38,6 +39,8 @@ document.getElementById("themeToggle").onclick = () => {
 document.getElementById("logout").onclick = () => {
     webSocket.send(JSON.stringify({ type: 'vehicleUnfocus', value: window.selectedVehicle}))
     window.selectedVehicle = null;
+    currentPattern = null;
+    currentLine = null;
     loginDiv.style.display = "flex";
 }
 
@@ -88,8 +91,9 @@ function startWebSocket() {
                 }
                 lastKnownVehicleInfo = data.value;
                 moveMapToLatLon(data.value)
-                if(currentLine !== data.value.line_id) {
+                if(currentLine !== data.value.line_id || currentPattern !== data.value.pattern_id) {
                     currentLine = data.value.line_id
+                    currentPattern = data.value.pattern_id
                     if(!patternCache[data.value.pattern_id]) {
                         fetch("https://go.tmlmobilidade.pt/hub/api/v1/network/patterns/%5BLA77N%5D" + data.value.pattern_id.split("]")[2]).then(p => p.json()).then(p => {
                             patternIdDestCache[data.value.pattern_id] = p.data[0].headsign;
