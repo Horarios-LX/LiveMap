@@ -95,7 +95,7 @@ function startWebSocket() {
                     currentLine = data.value.line_id
                     currentPattern = data.value.pattern_id
                     if(!patternCache[data.value.pattern_id]) {
-                        fetch("https://go.tmlmobilidade.pt/hub/api/v1/network/patterns/%5BLA77N%5D" + data.value.pattern_id.split("]")[2]).then(p => p.json()).then(p => {
+                        fetch("https://go.tmlmobilidade.pt/hub/api/v1/LA3SO/network/patterns/%5BLA77N%5D" + data.value.pattern_id.split("]")[2]).then(p => p.json()).then(p => {
                             patternIdDestCache[data.value.pattern_id] = p.data[0].headsign;
                             serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)}`
                             
