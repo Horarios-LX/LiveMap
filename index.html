@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl.css">
     </head>
     <body>
+        <script type="module" src="./map.js"></script>
         <div id="loginDiv">
             <label for="vehicleId">Nº de frota:</label><input id="vehicleId" inputmode="numeric" pattern="[0-9]" autocomplete="off" maxlength="4" placeholder="1400">
             <p id="status"><span></span></p>
@@ -31,7 +32,6 @@
         </div>
         <p id="serviceInfo"><span class="line long">1613</span><span>Abóboda | A circular</span></p>
         <script src="https://unpkg.com/@googlemaps/polyline-codec/dist/index.umd.js"></script>
-        <script type="module" src="./map.js"></script>
         <script src="./index.js"></script>
     </body>
 </html>

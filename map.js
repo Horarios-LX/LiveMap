@@ -220,6 +220,7 @@ window.updateOtherCars = (vehicles) => {
 }
 
 window.moveMapToLatLon = (vehicle) => {
+    console.log(vehicle)
     if (!vehicle.lon || !vehicle.lat) return;
     if (snapped) {
 

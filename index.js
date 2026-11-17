@@ -18,7 +18,7 @@ let currentPattern = null;
 
 let patternCache = {}
 
-const wsUri = "wss://ws.doesmtr.eu/";
+const wsUri = "wss://horarioslx.onmtr.eu/vehicles/feed";
 let webSocket = null;
 
 startWebSocket()
@@ -44,6 +44,8 @@ document.getElementById("logout").onclick = () => {
     loginDiv.style.display = "flex";
 }
 
+snapToVehicle = () => {};
+
 recenterBtn.onclick = () => {
     if(lastKnownVehicleInfo) snapToVehicle(lastKnownVehicleInfo)
 }
@@ -55,6 +57,7 @@ function startWebSocket() {
 
     webSocket.addEventListener("open", () => {
         console.log("CONNECTED");
+        if(window.selectedVehicle) webSocket.send(JSON.stringify({ type: 'vehicleFocus', value: {vehicleId: "[LA77N]" + window.selectedVehicle, radius: 3} }));
     });
 
     webSocket.addEventListener("message", (event) => {
@@ -65,10 +68,10 @@ function startWebSocket() {
             }
             return;
         };
-        let data = JSON.parse(event.data)
-        switch(data.type) {
-            case "vehicleValidation":
-                let vehicle = data.value;
+        let res = JSON.parse(event.data)
+        switch(res.type) {
+            case "vehicleInfo":
+                let vehicle = res.data;
                 if(!vehicle && vehicleIdInput.value.trim() !== '') {
                     vehicleIdStatus.innerHTML = "Veículo não encontrado"
                     loginButton.disabled = true;
@@ -79,38 +82,42 @@ function startWebSocket() {
                     loginButton.disabled = false;
                     let timestamp = vehicle.timestamp;
                     let timeDif = (Date.now() - timestamp) / 1000;
+                    vehicle.line_id = vehicle.trip_id.split("]")[2].split("_")[0]
                     if(timeDif < 120) {
                         vehicleIdStatus.innerHTML = 'A circular na <span class="line long">' + (vehicle.line_id) + '</span>.'
                     } else vehicleIdStatus.innerHTML = 'Circulou na <span class="line long">' + (vehicle.line_id) + '</span> há ' + formatTimeSeconds(timeDif) + '.'
                 }
                 break;
-            case "vehicleUpdate":
-                if(!lastKnownVehicleInfo || lastKnownVehicleInfo.id !== data.value.id) {
+            case "vehicleData":
+                vehicleData = res.data.find(z => z.selected === true);
+                if(!vehicleData) return;
+                if(!lastKnownVehicleInfo || lastKnownVehicleInfo.id !== vehicleData.id) {
                     snapToVehicle(lastKnownVehicleInfo)
                     serviceInfo.innerHTML = `A carregar...`
                 }
-                lastKnownVehicleInfo = data.value;
-                moveMapToLatLon(data.value)
-                if(currentLine !== data.value.line_id || currentPattern !== data.value.pattern_id) {
-                    currentLine = data.value.line_id
-                    currentPattern = data.value.pattern_id
-                    if(!patternCache[data.value.pattern_id]) {
-                        fetch("https://go.tmlmobilidade.pt/hub/api/v1/LA3SO/network/patterns/%5BLA77N%5D" + data.value.pattern_id.split("]")[2]).then(p => p.json()).then(p => {
-                            patternIdDestCache[data.value.pattern_id] = p.data[0].headsign;
-                            serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)}`
+                lastKnownVehicleInfo = vehicleData;
+                moveMapToLatLon(vehicleData)
+                vehicleData.line_id = vehicleData.trip_id.split("]")[2].split("_")[0]
+                vehicleData.pattern_id = vehicleData.trip_id.split("]").slice(1).join("]").split("_").slice(0, 3).join("_")
+                if(currentLine !== vehicleData.line_id || currentPattern !== vehicleData.pattern_id) {
+                    currentLine = vehicleData.line_id
+                    currentPattern = vehicleData.pattern_id
+                    if(!patternCache[vehicleData.pattern_id]) {
+                        fetch("https://go.tmlmobilidade.pt/hub/api/v1/LA3SO/network/patterns/" + vehicleData.pattern_id).then(p => p.json()).then(p => {
+                            patternIdDestCache[vehicleData.pattern_id] = p.data[0].headsign;
+                            serviceInfo.innerHTML = `<span class="line long">${vehicleData.line_id}</span><span>${getDest(vehicleData.pattern_id)}`
                             
-                            patternCache[data.value.pattern_id] = decodeShape(p.data[0].shape_polyline);
+                            patternCache[vehicleData.pattern_id] = decodeShape(p.data[0].shape_polyline);
                             drawMainRoute(decodeShape(p.data[0].shape_polyline));
                         })
                     } else {
-                        serviceInfo.innerHTML = `<span class="line long">${data.value.line_id}</span><span>${getDest(data.value.pattern_id)}`
-                        drawMainRoute(patternCache[data.value.pattern_id])
+                        serviceInfo.innerHTML = `<span class="line long">${vehicleData.line_id}</span><span>${getDest(vehicleData.pattern_id)}`
+                        drawMainRoute(patternCache[vehicleData.pattern_id])
                     }
                     
                 }
+                updateOtherCars(res.data.filter(z => z.selected !== true))
                 break;
-            case "vehicleNeighbours":
-                updateOtherCars(data.value)
         }
         // A circular na <span class="line long">1622</span>.
     });
@@ -131,12 +138,12 @@ vehicleIdInput.addEventListener('input', function() {
         loginButton.disabled = true;
     }
 
-    webSocket.send(JSON.stringify({ type: 'vehicleIdInput', value: vehicleIdInput.value }));
+    webSocket.send(JSON.stringify({ type: 'vehicleQuery', value: "[LA77N]" + vehicleIdInput.value }));
 })
 
 loginButton.onclick = () => {
     window.selectedVehicle = vehicleIdInput.value;
-    webSocket.send(JSON.stringify({ type: 'vehicleFocus', value: vehicleIdInput.value}))
+    webSocket.send(JSON.stringify({ type: 'vehicleFocus', value: {vehicleId: "[LA77N]" + vehicleIdInput.value, radius: 3} }));
     loginDiv.style.display = "none";
 }
 
